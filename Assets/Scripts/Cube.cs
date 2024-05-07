@@ -1,20 +1,27 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent (typeof(MeshRenderer))]
+[RequireComponent(typeof(MeshRenderer), typeof(Rigidbody), typeof(Colorer))]
 
 public class Cube : MonoBehaviour
 {
+    private Rigidbody _rigidbody;
+    private Colorer _colorer;
     private MeshRenderer _meshRenderer;
     private float _divisionChance = 100;
     private float _forceExplosion = 100f;
     private float _radiusExplosion = 100f;
 
-    private void OnEnable()
+    private void Awake()
     {
         _meshRenderer = GetComponent<MeshRenderer>();
+        _rigidbody = GetComponent<Rigidbody>();
+        _colorer = GetComponent<Colorer>();
+    }
 
-        PaintInRandomColor();
+    private void OnEnable()
+    {
+        _colorer.PaintInRandomColor(_meshRenderer);
     }
 
     private void OnMouseDown()
@@ -30,7 +37,7 @@ public class Cube : MonoBehaviour
 
         if (_divisionChance >= randomValueDivisionChance)
         {
-            _divisionChance /= divider;
+            ReduceDivisionChance(divider);
 
             List<Rigidbody> cubesCreated = new();
 
@@ -38,17 +45,14 @@ public class Cube : MonoBehaviour
             {
                 Cube cube = Instantiate(this, transform.position, Quaternion.identity);
 
-                cube.transform.localScale /= divider;
+                ReduceScale(cube.gameObject, divider);
 
-                if(cube.TryGetComponent(out Rigidbody cubeRigidbody))
-                {
-                    cubesCreated.Add(cubeRigidbody);
-                }
+                cubesCreated.Add(_rigidbody);
             }
 
-            transform.localScale /= divider;
+            ReduceScale(gameObject, divider);
 
-            PaintInRandomColor();
+            _colorer.PaintInRandomColor(_meshRenderer);
 
             foreach (var item in cubesCreated)
             {
@@ -61,8 +65,13 @@ public class Cube : MonoBehaviour
         }
     }
 
-    private void PaintInRandomColor()
+    private void ReduceScale(GameObject cube, float divider)
     {
-        _meshRenderer.material.color = Random.ColorHSV();
+        cube.transform.localScale /= divider;
+    }
+
+    private void ReduceDivisionChance(float divider)
+    {
+        _divisionChance /= divider;
     }
 }
