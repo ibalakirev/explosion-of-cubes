@@ -1,22 +1,25 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(MeshRenderer), typeof(Rigidbody), typeof(Colorer))]
+[RequireComponent(typeof(MeshRenderer), typeof(Rigidbody), typeof(Colorizer))]
+[RequireComponent (typeof(Spawner), typeof(Exploder))]
 
 public class Cube : MonoBehaviour
 {
+    private Exploder _exploder;
+    private Spawner _spawner;
     private Rigidbody _rigidbody;
-    private Colorer _colorer;
+    private Colorizer _colorer;
     private MeshRenderer _meshRenderer;
     private float _divisionChance = 100;
-    private float _forceExplosion = 100f;
-    private float _radiusExplosion = 100f;
 
     private void Awake()
     {
+        _exploder = GetComponent<Exploder>();
+        _spawner = GetComponent<Spawner>();
         _meshRenderer = GetComponent<MeshRenderer>();
         _rigidbody = GetComponent<Rigidbody>();
-        _colorer = GetComponent<Colorer>();
+        _colorer = GetComponent<Colorizer>();
     }
 
     private void OnEnable()
@@ -42,12 +45,12 @@ public class Cube : MonoBehaviour
             List<Rigidbody> cubesCreated = new();
 
             for (int i = 0; i < randomValueQuantityCubes; i++)
-            {
-                Cube cube = Instantiate(this, transform.position, Quaternion.identity);
+            {              
+                Cube newCube = _spawner.GetCreateCube(this, transform);
 
-                ReduceScale(cube.gameObject, divider);
+                ReduceScale(newCube.gameObject, divider);
 
-                cubesCreated.Add(_rigidbody);
+                cubesCreated.Add(newCube._rigidbody);
             }
 
             ReduceScale(gameObject, divider);
@@ -56,7 +59,7 @@ public class Cube : MonoBehaviour
 
             foreach (var item in cubesCreated)
             {
-                item.AddExplosionForce(_forceExplosion, transform.position, _radiusExplosion);
+                _exploder.Explode(item, transform);
             }
         }
         else

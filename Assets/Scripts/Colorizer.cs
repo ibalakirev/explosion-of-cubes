@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class Colorer : MonoBehaviour
+public class Colorizer : MonoBehaviour
 {
     public void PaintInRandomColor(MeshRenderer meshRenderer)
     {
