@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(MeshRenderer), typeof(Rigidbody), typeof(Colorizer))]
-[RequireComponent (typeof(Spawner), typeof(Exploder))]
+[RequireComponent(typeof(Spawner), typeof(Exploder))]
 
 public class Cube : MonoBehaviour
 {
@@ -12,6 +12,7 @@ public class Cube : MonoBehaviour
     private Colorizer _colorer;
     private MeshRenderer _meshRenderer;
     private float _divisionChance = 100;
+    private Transform _currentPosition;
 
     private void Awake()
     {
@@ -27,6 +28,13 @@ public class Cube : MonoBehaviour
         _colorer.PaintInRandomColor(_meshRenderer);
     }
 
+    private void OnDisable()
+    {
+        _currentPosition = transform;
+
+        _exploder.ExplodeAllCubesInRadius(_currentPosition);
+    }
+
     private void OnMouseDown()
     {
         float minRandomValue = 0f;
@@ -38,6 +46,9 @@ public class Cube : MonoBehaviour
         float randomValueDivisionChance = Random.Range(minRandomValue, maxRandomValue);
         float randomValueQuantityCubes = Random.Range(minRandomValueQuantityCubes, maxRandomValueQuantityCubes);
 
+        _exploder.IncreaseForceUltimateExplosion();
+        _exploder.IncreaseRadiusUltimateExplosion();
+
         if (_divisionChance >= randomValueDivisionChance)
         {
             ReduceDivisionChance(divider);
@@ -45,10 +56,13 @@ public class Cube : MonoBehaviour
             List<Rigidbody> cubesCreated = new();
 
             for (int i = 0; i < randomValueQuantityCubes; i++)
-            {              
+            {
                 Cube newCube = _spawner.GetCreateCube(this, transform);
 
                 ReduceScale(newCube.gameObject, divider);
+
+                newCube._exploder.IncreaseForceUltimateExplosion();
+                newCube._exploder.IncreaseRadiusUltimateExplosion();
 
                 cubesCreated.Add(newCube._rigidbody);
             }
@@ -59,7 +73,7 @@ public class Cube : MonoBehaviour
 
             foreach (var item in cubesCreated)
             {
-                _exploder.Explode(item, transform);
+                _exploder.ExplodeCreatedObjects(item, transform);
             }
         }
         else
