@@ -38,9 +38,9 @@ public class Cube : MonoBehaviour
     private void OnMouseDown()
     {
         float minRandomValue = 0f;
-        float maxRandomValue = 101f;
+        float maxRandomValue = 100f;
         float minRandomValueQuantityCubes = 2f;
-        float maxRandomValueQuantityCubes = 7f;
+        float maxRandomValueQuantityCubes = 6f;
         float divider = 2f;
 
         float randomValueDivisionChance = Random.Range(minRandomValue, maxRandomValue);
