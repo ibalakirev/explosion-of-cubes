@@ -39,7 +39,7 @@ public class Exploder : MonoBehaviour
         }
     }
 
-    public void ExplodeCreatedObjects(Rigidbody rigidbody, Transform transformObject)
+    public void ExplodeCurrentObject(Rigidbody rigidbody, Transform transformObject)
     {
         Explode(rigidbody, _forceExplosionSeparation, transformObject, _radiusExplosionSeparation);
     }

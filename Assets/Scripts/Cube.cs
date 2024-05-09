@@ -46,34 +46,32 @@ public class Cube : MonoBehaviour
         float randomValueDivisionChance = Random.Range(minRandomValue, maxRandomValue);
         float randomValueQuantityCubes = Random.Range(minRandomValueQuantityCubes, maxRandomValueQuantityCubes);
 
-        _exploder.IncreaseForceUltimateExplosion();
-        _exploder.IncreaseRadiusUltimateExplosion();
-
         if (_divisionChance >= randomValueDivisionChance)
         {
-            ReduceDivisionChance(divider);
-
             List<Rigidbody> cubesCreated = new();
+
+            _exploder.ExplodeCurrentObject(_rigidbody, transform);
+
+            _colorer.PaintInRandomColor(_meshRenderer);
+
+            ReduceDivisionChance(divider);
 
             for (int i = 0; i < randomValueQuantityCubes; i++)
             {
-                Cube newCube = _spawner.GetCreateCube(this, transform);
+                Cube newCube = _spawner.Create(this, transform);
 
                 ReduceScale(newCube.gameObject, divider);
 
-                newCube._exploder.IncreaseForceUltimateExplosion();
-                newCube._exploder.IncreaseRadiusUltimateExplosion();
+                IncreaseExplosionCharacteristics(newCube);
 
                 cubesCreated.Add(newCube._rigidbody);
             }
 
             ReduceScale(gameObject, divider);
 
-            _colorer.PaintInRandomColor(_meshRenderer);
-
             foreach (var item in cubesCreated)
             {
-                _exploder.ExplodeCreatedObjects(item, transform);
+                _exploder.ExplodeCurrentObject(item, transform);
             }
         }
         else
@@ -90,5 +88,11 @@ public class Cube : MonoBehaviour
     private void ReduceDivisionChance(float divider)
     {
         _divisionChance /= divider;
+    }
+
+    private void IncreaseExplosionCharacteristics(Cube cube)
+    {
+        cube._exploder.IncreaseForceUltimateExplosion();
+        cube._exploder.IncreaseRadiusUltimateExplosion();
     }
 }
